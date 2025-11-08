@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Call Schedule - Mada{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Call Schedule</h2>
+    <p class="subtitle">Upcoming and past medication reminder and checkup calls</p>
+</div>
+
+{% if schedules %}
+<div class="schedule-filters">
+    <button class="filter-btn active" onclick="filterSchedule('all')">All</button>
+    <button class="filter-btn" onclick="filterSchedule('pending')">Pending</button>
+    <button class="filter-btn" onclick="filterSchedule('completed')">Completed</button>
+    <button class="filter-btn" onclick="filterSchedule('missed')">Missed</button>
+    <button class="filter-btn" onclick="filterSchedule('flagged')">Flagged</button>
+</div>
+
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Scheduled Time</th>
+                <th>Patient</th>
+                <th>Phone</th>
+                <th>Call Type</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for schedule in schedules %}
+            <tr class="schedule-row" data-status="{{ schedule.status }}">
+                <td>{{ schedule.scheduled_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>
+                    <a href="{{ url_for('patient_detail', patient_id=schedule.patient.id) }}">
+                        {{ schedule.patient.name }}
+                    </a>
+                </td>
+                <td>{{ schedule.patient.phone }}</td>
+                <td>{{ schedule.call_type.replace('_', ' ').title() }}</td>
+                <td><span class="badge-{{ schedule.status }}">{{ schedule.status }}</span></td>
+                <td>
+                    {% if schedule.status == 'pending' %}
+                    <button class="btn btn-small btn-success" onclick="simulateCall({{ schedule.id }}, true)">✓ Answered</button>
+                    <button class="btn btn-small btn-warning" onclick="simulateCall({{ schedule.id }}, false)">✗ Missed</button>
+                    {% else %}
+                    <span class="text-muted">{{ schedule.status.title() }}</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <p>No calls scheduled.</p>
+    <a href="{{ url_for('register_patient') }}" class="btn btn-primary">Register a Patient to Start</a>
+</div>
+{% endif %}
+
+<script>
+function filterSchedule(status) {
+    const rows = document.querySelectorAll('.schedule-row');
+    const buttons = document.querySelectorAll('.filter-btn');
+    
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    rows.forEach(row => {
+        if (status === 'all' || row.dataset.status === status) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+function simulateCall(scheduleId, answered) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/simulate_call/${scheduleId}`;
+    
+    const answeredInput = document.createElement('input');
+    answeredInput.type = 'hidden';
+    answeredInput.name = 'answered';
+    answeredInput.value = answered ? 'true' : 'false';
+    form.appendChild(answeredInput);
+    
+    if (answered) {
+        const durationInput = document.createElement('input');
+        durationInput.type = 'hidden';
+        durationInput.name = 'duration';
+        durationInput.value = Math.floor(Math.random() * 120) + 30;
+        form.appendChild(durationInput);
+        
+        const notesInput = document.createElement('input');
+        notesInput.type = 'hidden';
+        notesInput.name = 'notes';
+        notesInput.value = 'Patient confirmed medication adherence';
+        form.appendChild(notesInput);
+    } else {
+        const notesInput = document.createElement('input');
+        notesInput.type = 'hidden';
+        notesInput.name = 'notes';
+        notesInput.value = 'Patient did not answer the call';
+        form.appendChild(notesInput);
+    }
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+</script>
+{% endblock %}

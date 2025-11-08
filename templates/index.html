@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero">
+    <h2>Welcome to Mada</h2>
+    <p class="subtitle">Automated Medication Adherence Call System</p>
+    <p>Manage patient medication schedules with intelligent IVR call reminders</p>
+</div>
+
+<div class="features">
+    <div class="feature-card">
+        <h3>📋 Patient Management</h3>
+        <p>Register patients with complete medical information including diagnosis, medications, and vital statistics</p>
+        <a href="{{ url_for('register_patient') }}" class="btn btn-primary">Register New Patient</a>
+    </div>
+
+    <div class="feature-card">
+        <h3>📞 Automated Calls</h3>
+        <p>Smart call scheduling based on medication frequency and patient needs</p>
+        <a href="{{ url_for('call_schedule') }}" class="btn btn-primary">View Schedule</a>
+    </div>
+
+    <div class="feature-card">
+        <h3>🚩 Flagged Monitoring</h3>
+        <p>Track missed calls and flag patients who need follow-up attention</p>
+        <a href="{{ url_for('flagged_calls') }}" class="btn btn-primary">View Flagged</a>
+    </div>
+
+    <div class="feature-card">
+        <h3>👥 Patient List</h3>
+        <p>View all registered patients and their medication adherence status</p>
+        <a href="{{ url_for('patients') }}" class="btn btn-primary">View Patients</a>
+    </div>
+</div>
+
+<div class="info-section">
+    <h3>How It Works</h3>
+    <ol>
+        <li><strong>Register:</strong> Doctor registers patient with diagnosis and medication details</li>
+        <li><strong>Schedule:</strong> System automatically generates call schedule based on medication frequency</li>
+        <li><strong>Call:</strong> IVR system calls patients for medication reminders and checkups</li>
+        <li><strong>Monitor:</strong> Missed calls are flagged for doctor review and follow-up</li>
+    </ol>
+</div>
+{% endblock %}

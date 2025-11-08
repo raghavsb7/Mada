@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Register Patient - Mada{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Register New Patient</h2>
+</div>
+
+<form method="POST" action="{{ url_for('register_patient') }}" class="patient-form">
+    <div class="form-section">
+        <h3>Patient Information</h3>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="name">Full Name *</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number *</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="age">Age *</label>
+                <input type="number" id="age" name="age" min="0" max="150" required>
+            </div>
+            <div class="form-group">
+                <label for="sex">Sex *</label>
+                <select id="sex" name="sex" required>
+                    <option value="">Select...</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="height">Height (cm) *</label>
+                <input type="number" id="height" name="height" step="0.1" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="weight">Weight (kg) *</label>
+                <input type="number" id="weight" name="weight" step="0.1" min="0" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="diagnosis">Diagnosis *</label>
+            <textarea id="diagnosis" name="diagnosis" rows="3" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="doctor_name">Doctor Name *</label>
+            <input type="text" id="doctor_name" name="doctor_name" required>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h3>Medication Information</h3>
+        <div id="medications-container">
+            <div class="medication-entry" data-med-num="1">
+                <h4>Medication 1</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="med_name_1">Medication Name *</label>
+                        <input type="text" id="med_name_1" name="med_name_1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="med_dosage_1">Dosage *</label>
+                        <input type="text" id="med_dosage_1" name="med_dosage_1" placeholder="e.g., 500mg" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="med_frequency_1">Frequency *</label>
+                        <select id="med_frequency_1" name="med_frequency_1" required>
+                            <option value="">Select...</option>
+                            <option value="once daily">Once Daily</option>
+                            <option value="twice daily">Twice Daily</option>
+                            <option value="three times daily">Three Times Daily</option>
+                            <option value="four times daily">Four Times Daily</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="med_duration_1">Duration (days) *</label>
+                        <input type="number" id="med_duration_1" name="med_duration_1" min="1" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="med_instructions_1">Special Instructions</label>
+                    <textarea id="med_instructions_1" name="med_instructions_1" rows="2" placeholder="e.g., Take with food"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <input type="hidden" id="med_count" name="med_count" value="1">
+        <button type="button" class="btn btn-secondary" onclick="addMedication()">+ Add Another Medication</button>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-large">Register Patient & Generate Schedule</button>
+        <a href="{{ url_for('patients') }}" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+
+<script>
+let medicationCount = 1;
+
+function addMedication() {
+    medicationCount++;
+    const container = document.getElementById('medications-container');
+    const newMed = document.createElement('div');
+    newMed.className = 'medication-entry';
+    newMed.setAttribute('data-med-num', medicationCount);
+    newMed.innerHTML = `
+        <h4>Medication ${medicationCount}</h4>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="med_name_${medicationCount}">Medication Name *</label>
+                <input type="text" id="med_name_${medicationCount}" name="med_name_${medicationCount}" required>
+            </div>
+            <div class="form-group">
+                <label for="med_dosage_${medicationCount}">Dosage *</label>
+                <input type="text" id="med_dosage_${medicationCount}" name="med_dosage_${medicationCount}" placeholder="e.g., 500mg" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="med_frequency_${medicationCount}">Frequency *</label>
+                <select id="med_frequency_${medicationCount}" name="med_frequency_${medicationCount}" required>
+                    <option value="">Select...</option>
+                    <option value="once daily">Once Daily</option>
+                    <option value="twice daily">Twice Daily</option>
+                    <option value="three times daily">Three Times Daily</option>
+                    <option value="four times daily">Four Times Daily</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="med_duration_${medicationCount}">Duration (days) *</label>
+                <input type="number" id="med_duration_${medicationCount}" name="med_duration_${medicationCount}" min="1" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="med_instructions_${medicationCount}">Special Instructions</label>
+            <textarea id="med_instructions_${medicationCount}" name="med_instructions_${medicationCount}" rows="2" placeholder="e.g., Take with food"></textarea>
+        </div>
+        <button type="button" class="btn btn-danger btn-small" onclick="removeMedication(${medicationCount})">Remove</button>
+    `;
+    container.appendChild(newMed);
+    document.getElementById('med_count').value = medicationCount;
+}
+
+function removeMedication(medNum) {
+    const medEntry = document.querySelector(`[data-med-num="${medNum}"]`);
+    if (medEntry) {
+        medEntry.remove();
+    }
+}
+</script>
+{% endblock %}

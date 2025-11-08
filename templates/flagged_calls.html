@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Flagged Calls - Mada{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Flagged Calls</h2>
+    <p class="subtitle">Patients who missed their calls and need follow-up</p>
+</div>
+
+{% if flagged_calls %}
+<div class="alert alert-warning">
+    <strong>⚠️ {{ flagged_calls|length }} patients need attention</strong>
+</div>
+
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Call Time</th>
+                <th>Patient</th>
+                <th>Phone</th>
+                <th>Diagnosis</th>
+                <th>Doctor</th>
+                <th>Notes</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in flagged_calls %}
+            <tr class="flagged-row">
+                <td>{{ log.call_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>
+                    <a href="{{ url_for('patient_detail', patient_id=log.patient.id) }}">
+                        <strong>{{ log.patient.name }}</strong>
+                    </a>
+                </td>
+                <td>{{ log.patient.phone }}</td>
+                <td>{{ log.patient.diagnosis }}</td>
+                <td>{{ log.patient.doctor_name }}</td>
+                <td>{{ log.notes }}</td>
+                <td>
+                    <a href="{{ url_for('patient_detail', patient_id=log.patient.id) }}" class="btn btn-small btn-primary">View Patient</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state success">
+    <p>✓ No flagged calls! All patients are responding well.</p>
+    <a href="{{ url_for('call_schedule') }}" class="btn btn-primary">View Call Schedule</a>
+</div>
+{% endif %}
+{% endblock %}
