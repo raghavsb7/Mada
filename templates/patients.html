@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Patients - Mada{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Registered Patients</h2>
+    <a href="{{ url_for('register_patient') }}" class="btn btn-primary">+ Register New Patient</a>
+</div>
+
+{% if patients %}
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Age/Sex</th>
+                <th>Diagnosis</th>
+                <th>Doctor</th>
+                <th>Phone</th>
+                <th>Registered</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for patient in patients %}
+            <tr>
+                <td><strong>{{ patient.name }}</strong></td>
+                <td>{{ patient.age }} / {{ patient.sex }}</td>
+                <td>{{ patient.diagnosis }}</td>
+                <td>{{ patient.doctor_name }}</td>
+                <td>{{ patient.phone }}</td>
+                <td>{{ patient.created_at.strftime('%Y-%m-%d') }}</td>
+                <td>
+                    <a href="{{ url_for('patient_detail', patient_id=patient.id) }}" class="btn btn-small">View Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <p>No patients registered yet.</p>
+    <a href="{{ url_for('register_patient') }}" class="btn btn-primary">Register Your First Patient</a>
+</div>
+{% endif %}
+{% endblock %}

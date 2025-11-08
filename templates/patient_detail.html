@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}{{ patient.name }} - Patient Details{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Patient Details</h2>
+    <a href="{{ url_for('patients') }}" class="btn btn-secondary">← Back to Patients</a>
+</div>
+
+<div class="patient-detail-container">
+    <div class="detail-card">
+        <h3>Personal Information</h3>
+        <div class="detail-grid">
+            <div class="detail-item">
+                <label>Name:</label>
+                <span>{{ patient.name }}</span>
+            </div>
+            <div class="detail-item">
+                <label>Age:</label>
+                <span>{{ patient.age }} years</span>
+            </div>
+            <div class="detail-item">
+                <label>Sex:</label>
+                <span>{{ patient.sex }}</span>
+            </div>
+            <div class="detail-item">
+                <label>Height:</label>
+                <span>{{ patient.height }} cm</span>
+            </div>
+            <div class="detail-item">
+                <label>Weight:</label>
+                <span>{{ patient.weight }} kg</span>
+            </div>
+            <div class="detail-item">
+                <label>BMI:</label>
+                <span>{{ "%.1f"|format(patient.weight / ((patient.height/100) ** 2)) }}</span>
+            </div>
+            <div class="detail-item">
+                <label>Phone:</label>
+                <span>{{ patient.phone }}</span>
+            </div>
+            <div class="detail-item">
+                <label>Doctor:</label>
+                <span>{{ patient.doctor_name }}</span>
+            </div>
+        </div>
+        <div class="detail-item full-width">
+            <label>Diagnosis:</label>
+            <p>{{ patient.diagnosis }}</p>
+        </div>
+    </div>
+
+    <div class="detail-card">
+        <h3>Medications</h3>
+        {% if patient.medications %}
+        <div class="medications-list">
+            {% for med in patient.medications %}
+            <div class="medication-item">
+                <h4>{{ med.name }}</h4>
+                <p><strong>Dosage:</strong> {{ med.dosage }}</p>
+                <p><strong>Frequency:</strong> {{ med.frequency }}</p>
+                <p><strong>Duration:</strong> {{ med.duration_days }} days</p>
+                {% if med.instructions %}
+                <p><strong>Instructions:</strong> {{ med.instructions }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No medications prescribed.</p>
+        {% endif %}
+    </div>
+
+    <div class="detail-card">
+        <h3>Call Schedule</h3>
+        {% if schedules %}
+        <div class="schedule-list">
+            {% for schedule in schedules[:10] %}
+            <div class="schedule-item status-{{ schedule.status }}">
+                <div class="schedule-info">
+                    <span class="schedule-time">{{ schedule.scheduled_time.strftime('%Y-%m-%d %H:%M') }}</span>
+                    <span class="schedule-type">{{ schedule.call_type.replace('_', ' ').title() }}</span>
+                    <span class="schedule-status badge-{{ schedule.status }}">{{ schedule.status }}</span>
+                </div>
+                {% if schedule.status == 'pending' %}
+                <div class="schedule-actions">
+                    <button class="btn btn-small btn-success" onclick="simulateCall({{ schedule.id }}, true)">✓ Answered</button>
+                    <button class="btn btn-small btn-warning" onclick="simulateCall({{ schedule.id }}, false)">✗ Missed</button>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            {% if schedules|length > 10 %}
+            <p class="text-muted">Showing 10 of {{ schedules|length }} scheduled calls</p>
+            {% endif %}
+        </div>
+        {% else %}
+        <p>No calls scheduled.</p>
+        {% endif %}
+    </div>
+
+    <div class="detail-card">
+        <h3>Call History</h3>
+        {% if call_logs %}
+        <div class="call-logs-list">
+            {% for log in call_logs %}
+            <div class="call-log-item {% if log.flagged %}flagged{% endif %}">
+                <div class="log-time">{{ log.call_time.strftime('%Y-%m-%d %H:%M') }}</div>
+                <div class="log-status">
+                    {% if log.answered %}
+                    <span class="badge-completed">✓ Answered</span>
+                    <span class="log-duration">Duration: {{ log.duration }}s</span>
+                    {% else %}
+                    <span class="badge-missed">✗ Missed</span>
+                    {% if log.flagged %}
+                    <span class="badge-flagged">🚩 Flagged</span>
+                    {% endif %}
+                    {% endif %}
+                </div>
+                {% if log.notes %}
+                <div class="log-notes">{{ log.notes }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No call history yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function simulateCall(scheduleId, answered) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/simulate_call/${scheduleId}`;
+    
+    const answeredInput = document.createElement('input');
+    answeredInput.type = 'hidden';
+    answeredInput.name = 'answered';
+    answeredInput.value = answered ? 'true' : 'false';
+    form.appendChild(answeredInput);
+    
+    if (answered) {
+        const durationInput = document.createElement('input');
+        durationInput.type = 'hidden';
+        durationInput.name = 'duration';
+        durationInput.value = Math.floor(Math.random() * 120) + 30; // 30-150 seconds
+        form.appendChild(durationInput);
+        
+        const notesInput = document.createElement('input');
+        notesInput.type = 'hidden';
+        notesInput.name = 'notes';
+        notesInput.value = 'Patient confirmed medication adherence';
+        form.appendChild(notesInput);
+    } else {
+        const notesInput = document.createElement('input');
+        notesInput.type = 'hidden';
+        notesInput.name = 'notes';
+        notesInput.value = 'Patient did not answer the call';
+        form.appendChild(notesInput);
+    }
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+</script>
+{% endblock %}
