@@ -39,15 +39,31 @@ cd Mada
 pip install -r requirements.txt
 ```
 
-3. Run the application:
+3. Configure environment (optional):
+```bash
+cp .env.example .env
+# Edit .env to set your configuration
+```
+
+4. Run the application:
 ```bash
 python app.py
 ```
 
-4. Open your browser and navigate to:
+5. Open your browser and navigate to:
 ```
 http://localhost:5000
 ```
+
+## Security Note
+
+**Important**: This application is configured to run with debug mode disabled by default for security. Only enable debug mode in development environments by setting `FLASK_DEBUG=true` in your environment variables.
+
+In production:
+- Change the `SECRET_KEY` in `app.py` to a strong random key
+- Use a production WSGI server (e.g., Gunicorn, uWSGI)
+- Enable HTTPS
+- Set up proper authentication and authorization
 
 ## Usage
 
